@@ -32,6 +32,7 @@ urlpatterns = [
          name='remove-single-item-from-cart'),
     # path('payment/<payment_option>/', PaymentView.as_view(), name='payment'),
     path("paypal-payment/", PayPalPaymentView.as_view(), name="paypal-payment"),
+    
 
     path('payment-success/', PaymentSuccessView.as_view(), name='payment-success'),
     path('request-refund/', RequestRefundView.as_view(), name='request-refund'),

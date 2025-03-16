@@ -4,6 +4,7 @@ import string
 import uuid
 from django.http import JsonResponse
 
+from django.urls import reverse
 import stripe
 from django.conf import settings
 from django.contrib import messages
@@ -36,10 +37,23 @@ def get_queryset(self):
 
 
 class PayPalPaymentView(View):
+    def get(self, request, *args, **kwargs):
+        # This method handles GET requests
+        try:
+            order = Order.objects.get(user=request.user, ordered=False)
+            context = {
+                'order': order,
+            }
+            return render(request, 'payment.html', context)
+        except ObjectDoesNotExist:
+            messages.error(request, "You do not have an active order")
+            return redirect("core:order-summary")
+    
     def post(self, request, *args, **kwargs):
+        # This method handles POST requests
         data = json.loads(request.body)
-        paypal_order_id = data.get("orderID")      # PayPal's order ID
-        django_order_id = data.get("djangoOrderId") # Your database order ID
+        paypal_order_id = data.get("orderID")
+        django_order_id = data.get("djangoOrderId")
         order = get_object_or_404(Order, id=django_order_id, ordered=False)
 
         # Create the payment
@@ -54,11 +68,12 @@ class PayPalPaymentView(View):
         # Update order status
         order.ordered = True
         order.payment = payment
-        order.ref_code = create_ref_code()  # Generate a reference code
-
+        order.ref_code = create_ref_code()
         order.save()
         
         return JsonResponse({"status": "Payment Successful", "transaction_id": payment.transaction_id})
+
+    
 
 
 class CheckoutView(View):
@@ -106,18 +121,17 @@ class CheckoutView(View):
         # Handle billing address
         self.handle_billing_address(form, order, request)
 
-        # Handle payment option
         payment_option = form.cleaned_data.get('payment_option')
-        redirect_url = 'core:payment'
+    
         if payment_option == 'S':
-            redirect_url += '?payment_option=stripe'
+        # For Stripe - you would need a stripe-payment URL 
+            return redirect(reverse('core:stripe-payment'))
         elif payment_option == 'P':
-            redirect_url += '?payment_option=paypal'
+        # For PayPal - use the correct URL name
+            return redirect(reverse('core:paypal-payment'))
         else:
             messages.warning(request, "Invalid payment option selected")
-            return
-
-        return redirect(redirect_url)
+        return
 
     def handle_shipping_address(self, form, order, request):
         use_default_shipping = form.cleaned_data.get('use_default_shipping')

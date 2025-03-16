@@ -1,65 +1,223 @@
 {% extends "base.html" %} {% load crispy_forms_tags %} {% block content %}
-<h2>Checkout</h2>
-<p>Total: ${{ order.get_total }}</p>
 
-<!-- PayPal Button Container -->
-<div id="paypal-button-container"></div>
+<main>
+  <div class="container wow fadeIn">
+    <h2 class="my-5 h2 text-center">Checkout form</h2>
+    <div class="row">
+      <div class="col-md-8 mb-4">
+        <div class="card">
+          <form method="POST" class="card-body">
+            {% csrf_token %}
 
-{% include "order_snippet.html" %}
+            <h3>Shipping address</h3>
 
-<!-- Load PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=Ae4QLC_-2UYkbqVhXA6Lb-r9bB3lEW9byzjxZvKZxb5lIc4VN94eCJ9i07jlLVoOW2ns8RzN5vYUb2u3&currency=USD"></script>
+            <div class="hideable_shipping_form">
+              <div class="md-form mb-5">
+                <input
+                  type="text"
+                  placeholder="1234 Main St"
+                  id="shipping_address"
+                  name="shipping_address"
+                  class="form-control"
+                />
+                <label for="shipping_address" class="">Address</label>
+              </div>
+
+              <div class="md-form mb-5">
+                <input
+                  type="text"
+                  placeholder="Apartment or suite"
+                  id="shipping_address2"
+                  name="shipping_address2"
+                  class="form-control"
+                />
+                <label for="shipping_address2" class=""
+                  >Address 2 (optional)</label
+                >
+              </div>
+
+              <div class="row">
+                <div class="col-lg-4 col-md-12 mb-4">
+                  <label for="country">Country</label>
+                  {{ form.shipping_country }}
+                  <div class="invalid-feedback">
+                    Please select a valid country.
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                  <label for="shipping_zip">Zip</label>
+                  <input
+                    type="text"
+                    placeholder="Zip code"
+                    id="shipping_zip"
+                    name="shipping_zip"
+                    class="form-control"
+                  />
+                  <div class="invalid-feedback">Zip code required.</div>
+                </div>
+              </div>
+
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  name="same_billing_address"
+                  id="same_billing_address"
+                />
+                <label class="custom-control-label" for="same_billing_address"
+                  >Billing address is the same as my shipping address</label
+                >
+              </div>
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  name="set_default_shipping"
+                  id="set_default_shipping"
+                />
+                <label class="custom-control-label" for="set_default_shipping"
+                  >Save as default shipping address</label
+                >
+              </div>
+            </div>
+
+            {% if default_shipping_address %}
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="use_default_shipping"
+                id="use_default_shipping"
+              />
+              <label class="custom-control-label" for="use_default_shipping"
+                >Use default shipping address: {{
+                default_shipping_address.street_address|truncatechars:10
+                }}</label
+              >
+            </div>
+            {% endif %}
+
+            <hr />
+
+            <h3>Billing address</h3>
+
+            <div class="hideable_billing_form">
+              <div class="md-form mb-5">
+                <input
+                  type="text"
+                  placeholder="1234 Main St"
+                  id="billing_address"
+                  name="billing_address"
+                  class="form-control"
+                />
+                <label for="billing_address" class="">Address</label>
+              </div>
+
+              <div class="md-form mb-5">
+                <input
+                  type="text"
+                  placeholder="Apartment or suite"
+                  id="billing_address2"
+                  name="billing_address2"
+                  class="form-control"
+                />
+                <label for="billing_address2" class=""
+                  >Address 2 (optional)</label
+                >
+              </div>
+
+              <div class="row">
+                <div class="col-lg-4 col-md-12 mb-4">
+                  <label for="country">Country</label>
+                  {{ form.billing_country }}
+                  <div class="invalid-feedback">
+                    Please select a valid country.
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                  <label for="billing_zip">Zip</label>
+                  <input
+                    type="text"
+                    placeholder="Zip code"
+                    id="billing_zip"
+                    name="billing_zip"
+                    class="form-control"
+                  />
+                  <div class="invalid-feedback">Zip code required.</div>
+                </div>
+              </div>
+
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  name="set_default_billing"
+                  id="set_default_billing"
+                />
+                <label class="custom-control-label" for="set_default_billing"
+                  >Save as default billing address</label
+                >
+              </div>
+            </div>
+
+            {% if default_billing_address %}
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                name="use_default_billing"
+                id="use_default_billing"
+              />
+              <label class="custom-control-label" for="use_default_billing"
+                >Use default billing address: {{
+                default_billing_address.street_address|truncatechars:10
+                }}</label
+              >
+            </div>
+            {% endif %}
+            <hr />
+
+            <h3>Payment option</h3>
+
+            <div class="d-block my-3">
+              <div class="custom-control custom-radio">
+                <input
+                  id="PayPal"
+                  name="payment_option"
+                  value="P"
+                  type="radio"
+                  class="custom-control-input"
+                  required
+                  checked
+                />
+                <label class="custom-control-label" for="PayPal">PayPal</label>
+              </div>
+            </div>
+
+            <hr class="mb-4" />
+            <button class="btn btn-primary btn-lg btn-block" type="submit">
+              Continue to checkout
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-4">{% include "order_snippet.html" %}</div>
+    </div>
+  </div>
+</main>
+
+{% endblock content %} {% block extra_scripts %}
 
 <script>
-  // Initialize PayPal button
-  paypal
-    .Buttons({
-      createOrder: function (data, actions) {
-        return actions.order.create({
-          purchase_units: [
-            {
-              amount: {
-                value: "{{ order.get_total }}",
-              },
-              // Optional: Include your order ID as custom reference
-              custom_id: "{{ order.id }}",
-            },
-          ],
-        });
-      },
-      onApprove: function (data, actions) {
-        return actions.order.capture().then(function (details) {
-          fetch("{% url 'core:paypal-payment' %}", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": "{{ csrf_token }}",
-            },
-            body: JSON.stringify({
-              orderID: data.orderID,
-              djangoOrderId: {{ order.id }}  // Add your Django order ID here
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              window.location.href = "/payment-success/?transaction_id=" + data.transaction_id;
-
-            });
-        });
-      },
-    })
-    .render("#paypal-button-container");
+  document.querySelector("form").addEventListener("submit", function (event) {
+    // Since there's only PayPal option now, we can simplify this
+    event.preventDefault(); // Prevent the form from submitting normally
+    window.location.href = "{% url 'core:paypal-payment' %}"; // Redirect to PayPal payment page
+  });
 </script>
-<a href="{% url 'core:home' %}">Back to Product List</a>
-
-{% if request.GET.success == "true" %}
-<div class="alert alert-success" role="alert">
-  🎉 تم الدفع بنجاح! رقم العملية: {{ request.GET.transaction_id }} شكرًا لتسوقك
-  معنا! 🛒
-</div>
-{% endif %} {% endblock content %} {% block extra_scripts %}
 <script>
-  // jQuery is required for this script
   var hideable_shipping_form = $(".hideable_shipping_form");
   var hideable_billing_form = $(".hideable_billing_form");
 
@@ -70,14 +228,20 @@
     "input[name=use_default_billing]"
   );
 
-  // Toggle shipping form visibility
   use_default_shipping.addEventListener("change", function () {
-    hideable_shipping_form.toggle(this.checked);
+    if (this.checked) {
+      hideable_shipping_form.hide();
+    } else {
+      hideable_shipping_form.show();
+    }
   });
 
-  // Toggle billing form visibility
   use_default_billing.addEventListener("change", function () {
-    hideable_billing_form.toggle(this.checked);
+    if (this.checked) {
+      hideable_billing_form.hide();
+    } else {
+      hideable_billing_form.show();
+    }
   });
 </script>
 {% endblock extra_scripts %}
