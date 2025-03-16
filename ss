@@ -21,8 +21,6 @@
               amount: {
                 value: "{{ order.get_total }}",
               },
-              // Optional: Include your order ID as custom reference
-              custom_id: "{{ order.id }}",
             },
           ],
         });
@@ -35,29 +33,22 @@
               "Content-Type": "application/json",
               "X-CSRFToken": "{{ csrf_token }}",
             },
-            body: JSON.stringify({
-              orderID: data.orderID,
-              djangoOrderId: {{ order.id }}  // Add your Django order ID here
-            }),
+            body: JSON.stringify({ orderID: data.orderID }),
           })
             .then((response) => response.json())
             .then((data) => {
-              window.location.href = "/payment-success/?transaction_id=" + data.transaction_id;
-
+              alert(
+                "Payment successful! Transaction ID: " + data.transaction_id
+              );
+              window.location.href = "/";
             });
         });
       },
     })
     .render("#paypal-button-container");
 </script>
-<a href="{% url 'core:home' %}">Back to Product List</a>
 
-{% if request.GET.success == "true" %}
-<div class="alert alert-success" role="alert">
-  🎉 تم الدفع بنجاح! رقم العملية: {{ request.GET.transaction_id }} شكرًا لتسوقك
-  معنا! 🛒
-</div>
-{% endif %} {% endblock content %} {% block extra_scripts %}
+{% endblock content %} {% block extra_scripts %}
 <script>
   // jQuery is required for this script
   var hideable_shipping_form = $(".hideable_shipping_form");
@@ -81,3 +72,19 @@
   });
 </script>
 {% endblock extra_scripts %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

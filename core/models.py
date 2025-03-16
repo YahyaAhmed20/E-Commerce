@@ -4,7 +4,10 @@ from django.db import models
 from django.db.models import Sum
 from django.shortcuts import reverse
 from django_countries.fields import CountryField
+import uuid
 
+
+from django.contrib.auth.models import User
 
 CATEGORY_CHOICES = (
     ('S', 'Shirt'),
@@ -150,14 +153,14 @@ class Address(models.Model):
 
 
 class Payment(models.Model):
-    stripe_charge_id = models.CharField(max_length=50)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.SET_NULL, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.FloatField()
+    transaction_id = models.CharField(max_length=100, unique=True, default=uuid.uuid4)
+    payment_method = models.CharField(max_length=50, default="PayPal")
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return f"Payment {self.transaction_id} - {self.amount}$"
 
 
 class Coupon(models.Model):
