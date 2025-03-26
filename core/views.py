@@ -29,7 +29,7 @@ def is_valid_form(fields):
 
 class HomeView(ListView):
     model = Item
-    paginate_by = 1  # Number of items per page
+    paginate_by = 10  # Number of items per page
     template_name = "home.html"
     
 def get_queryset(self):

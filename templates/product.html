@@ -6,70 +6,62 @@
     <div class="row wow fadeIn">
       <!--Grid column-->
       <div class="col-md-6 mb-4">
-        <img src="{{ item.image.url }}" class="card-img-top" />
-        <a href="{{ item.get_absolute_url }}">
-
+        <div class="card shadow-lg rounded">
+          <h3 class="card-header text-center">
+            Doctor Name : {{ item.title }}
+          </h3>
+          <img
+            src="{{ item.image.url }}"
+            class="card-img-top rounded-3 p-3"
+            alt="Item Image"
+          />
+        </div>
       </div>
       <!--Grid column-->
 
       <!--Grid column-->
       <div class="col-md-6 mb-4">
         <!--Content-->
-        <div class="p-4">
+        <div class="p-4 border rounded shadow-sm bg-light">
           <div class="mb-3">
-            <a href="">
-              <span class="badge purple mr-1"
-                >{{ object.get_category_display }}</span
-              >
+            <a href="#">
+              <span class="badge bg-primary text-white px-3 py-2">
+                {{ item.get_category_display }}
+              </span>
             </a>
           </div>
 
           <p class="lead">
-            {% if object.discount_price %}
-            <span class="mr-1">
-              <del>${{ object.price }}</del>
+            {% if item.discount_price %}
+            <span class="text-danger font-weight-bold">
+              <del>${{ item.price }}</del>
             </span>
-            <span>${{ object.discount_price }}</span>
+            <span class="text-success font-weight-bold"
+              >${{ item.discount_price }}</span
+            >
             {% else %}
-            <span>${{ object.price }}</span>
+            <span class="text-success font-weight-bold">${{ item.price }}</span>
             {% endif %}
           </p>
 
           <p class="lead font-weight-bold">Description</p>
+          <p>{{ item.description }}</p>
 
-          <p>{{ object.description }}</p>
-
-          {% comment %}
-          <form class="d-flex justify-content-left">
-            <!-- Default input -->
-            <input
-              type="number"
-              value="1"
-              aria-label="Search"
-              class="form-control"
-              style="width: 100px"
-            />
-            <button class="btn btn-primary btn-md my-0 p" type="submit">
-              Add to cart
-              <i class="fas fa-shopping-cart ml-1"></i>
-            </button>
-          </form>
-          {% endcomment %}
-          <a
-            href="{{ object.get_add_to_cart_url }}"
-            class="btn btn-primary btn-md my-0 p"
-          >
-            Add to cart
-            <i class="fas fa-shopping-cart ml-1"></i>
-          </a>
-          <a
-            href="{{ object.get_remove_from_cart_url }}"
-            class="btn btn-danger btn-md my-0 p"
-          >
-            Remove from cart
-          </a>
+          <div class="d-flex gap-3">
+            <a
+              href="{{ item.get_add_to_cart_url }}"
+              class="btn btn-success btn-lg"
+            >
+              <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+            </a>
+            <a
+              href="{{ item.get_remove_from_cart_url }}"
+              class="btn btn-danger btn-lg"
+            >
+              <i class="fas fa-trash-alt me-2"></i> Remove from Cart
+            </a>
+          </div>
         </div>
-        <!--Content-->
       </div>
       <!--Grid column-->
     </div>
@@ -77,56 +69,42 @@
 
     <hr />
 
-    <!--Grid row-->
+    <!-- About the doctor -->
     <div class="row d-flex justify-content-center wow fadeIn">
-      <!--Grid column-->
-      <div class="col-md-6 text-center">
-        <h4 class="my-4 h4">Additional information</h4>
-
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus
-          suscipit modi sapiente illo soluta odit voluptates, quibusdam officia.
-          Neque quibusdam quas a quis porro? Molestias illo neque eum in
-          laborum.
+      <div class="col-md-8 text-center">
+        <h4 class="my-4 h4">About the Doctor</h4>
+        <p class="bg-light p-3 border rounded shadow-sm">
+          {{ item.about_doctor }}
         </p>
       </div>
-      <!--Grid column-->
     </div>
-    <!--Grid row-->
 
-    <!--Grid row-->
+    <hr />
+
+    <!-- Clinic Photos -->
     <div class="row wow fadeIn">
-      <!--Grid column-->
-      <div class="col-lg-4 col-md-12 mb-4">
-        <img
-          src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/11.jpg"
-          class="img-fluid"
-          alt=""
-        />
+      <div class="col-md-12 text-center">
+        <h4 class="my-4 h4">Clinic Photos</h4>
       </div>
-      <!--Grid column-->
-
-      <!--Grid column-->
-      <div class="col-lg-4 col-md-6 mb-4">
-        <img
-          src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/12.jpg"
-          class="img-fluid"
-          alt=""
-        />
-      </div>
-      <!--Grid column-->
-
-      <!--Grid column-->
-      <div class="col-lg-4 col-md-6 mb-4">
-        <img
-          src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/13.jpg"
-          class="img-fluid"
-          alt=""
-        />
-      </div>
-      <!--Grid column-->
     </div>
-    <!--Grid row-->
+
+    <div class="row wow fadeIn g-3">
+      {% for photo in item.clinic_photos.all %}
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow-sm rounded">
+          <img
+            src="{{ photo.image.url }}"
+            class="card-img-top rounded-3"
+            alt="Clinic Photo"
+          />
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-md-12 text-center">
+        <p class="text-muted">No clinic photos available.</p>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 </main>
 

@@ -8,13 +8,9 @@ import uuid
 
 
 from django.contrib.auth.models import User
-
 CATEGORY_CHOICES = (
-    ('S', 'Shirt'),
-    ('SW', 'Sport wear'),
-    ('OW', 'Outwear')
-)
-
+('M', 'Makeup & Cosmetics'),
+('P', 'plastic surgeon'),)
 LABEL_CHOICES = (
     ('P', 'primary'),
     ('S', 'secondary'),
@@ -45,7 +41,8 @@ class Item(models.Model):
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     slug = models.SlugField()
     description = models.TextField()
-    image = models.ImageField()
+    image = models.ImageField(upload_to='items/')
+    about_doctor = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -65,6 +62,12 @@ class Item(models.Model):
             'slug': self.slug
         })
 
+class ClinicPhoto(models.Model):
+    item = models.ForeignKey(Item, related_name='clinic_photos', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='clinic_photos/')
+
+    def __str__(self):
+        return f"Photo of {self.item.title}"
 
 class OrderItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,

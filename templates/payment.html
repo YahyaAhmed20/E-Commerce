@@ -1,19 +1,45 @@
 {% extends "base.html" %} {% load crispy_forms_tags %} {% block content %}
-<h2>Checkout</h2>
-<p>Total: ${{ order.get_total }}</p>
 
-<!-- PayPal Button Container -->
-<div id="paypal-button-container"></div>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4">💳 Checkout</h2>
+        <p class="text-center lead">
+          Total Payment: <strong>${{ order.get_total }}</strong>
+        </p>
 
-{% comment %} {% include "order_snippet.html" %} {% endcomment %}
+        <!-- PayPal Button Container -->
+        <div id="paypal-button-container" class="text-center my-3"></div>
+
+        <hr class="my-4" />
+
+        <!-- Back to Products -->
+        <div class="text-center">
+          <a href="{% url 'core:home' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Back to Product List
+          </a>
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      {% if request.GET.success == "true" %}
+      <div class="alert alert-success text-center mt-4" role="alert">
+        🎉 <strong>تم الدفع بنجاح!</strong> رقم العملية:
+        <span class="fw-bold">{{ request.GET.transaction_id }}</span> شكرًا
+        لتسوقك معنا! 🛒
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
 <!-- Load PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=Ae4QLC_-2UYkbqVhXA6Lb-r9bB3lEW9byzjxZvKZxb5lIc4VN94eCJ9i07jlLVoOW2ns8RzN5vYUb2u3&currency=USD"></script>
 
 <script>
-  // Initialize PayPal button
-  paypal
-    .Buttons({
+  document.addEventListener("DOMContentLoaded", function () {
+    paypal.Buttons({
       createOrder: function (data, actions) {
         return actions.order.create({
           purchase_units: [
@@ -21,8 +47,7 @@
               amount: {
                 value: "{{ order.get_total }}",
               },
-              // Optional: Include your order ID as custom reference
-              custom_id: "{{ order.id }}",
+              custom_id: "{{ order.id }}", // Django Order ID
             },
           ],
         });
@@ -37,47 +62,32 @@
             },
             body: JSON.stringify({
               orderID: data.orderID,
-              djangoOrderId: {{ order.id }}  // Add your Django order ID here
+              djangoOrderId: {{ order.id }}
             }),
           })
-            .then((response) => response.json())
-            .then((data) => {
-              window.location.href = "/payment-success/?transaction_id=" + data.transaction_id;
-
-            });
+          .then(response => response.json())
+          .then(data => {
+            window.location.href = "/payment-success/?transaction_id=" + data.transaction_id;
+          });
         });
       },
-    })
-    .render("#paypal-button-container");
-</script>
-<a href="{% url 'core:home' %}">Back to Product List</a>
-
-{% if request.GET.success == "true" %}
-<div class="alert alert-success" role="alert">
-  🎉 تم الدفع بنجاح! رقم العملية: {{ request.GET.transaction_id }} شكرًا لتسوقك
-  معنا! 🛒
-</div>
-{% endif %} {% endblock content %} {% block extra_scripts %}
-<script>
-  // jQuery is required for this script
-  var hideable_shipping_form = $(".hideable_shipping_form");
-  var hideable_billing_form = $(".hideable_billing_form");
-
-  var use_default_shipping = document.querySelector(
-    "input[name=use_default_shipping]"
-  );
-  var use_default_billing = document.querySelector(
-    "input[name=use_default_billing]"
-  );
-
-  // Toggle shipping form visibility
-  use_default_shipping.addEventListener("change", function () {
-    hideable_shipping_form.toggle(this.checked);
+    }).render("#paypal-button-container");
   });
+</script>
 
-  // Toggle billing form visibility
-  use_default_billing.addEventListener("change", function () {
-    hideable_billing_form.toggle(this.checked);
+{% endblock content %} {% block extra_scripts %}
+<script>
+  $(document).ready(function () {
+    $(".hideable_shipping_form").hide();
+    $(".hideable_billing_form").hide();
+
+    $("input[name=use_default_shipping]").change(function () {
+      $(".hideable_shipping_form").toggle(!this.checked);
+    });
+
+    $("input[name=use_default_billing]").change(function () {
+      $(".hideable_billing_form").toggle(!this.checked);
+    });
   });
 </script>
 {% endblock extra_scripts %}

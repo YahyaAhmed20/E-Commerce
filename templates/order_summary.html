@@ -1,80 +1,98 @@
-{% extends "base.html" %}
-
-{% block content %}
-  <main>
-    <div class="container">
-
+{% extends "base.html" %} {% block content %}
+<main>
+  <div class="container">
     <div class="table-responsive text-nowrap">
-    <h2>Order Summary</h2>
-    <table class="table">
-        <thead>
-        <tr>
+      <h2 class="text-center my-4">🛒 Order Summary</h2>
+      <table class="table table-bordered">
+        <thead class="thead-dark">
+          <tr>
             <th scope="col">#</th>
-            <th scope="col">Item title</th>
+            <th scope="col">Doctor Name</th>
             <th scope="col">Price</th>
+
             <th scope="col">Quantity</th>
-            <th scope="col">Total Item Price</th>
-        </tr>
+
+            <th scope="col">Total Price</th>
+          </tr>
         </thead>
         <tbody>
-        {% for order_item in object.items.all %}
-        <tr>
+          {% for order_item in object.items.all %}
+          <tr>
             <th scope="row">{{ forloop.counter }}</th>
             <td>{{ order_item.item.title }}</td>
-            <td>{{ order_item.item.price }}</td>
-            <td>
-                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}"><i class="fas fa-minus mr-2"></i></a>
-                {{ order_item.quantity }}
-                <a href="{% url 'core:add-to-cart' order_item.item.slug %}"><i class="fas fa-plus ml-2"></i></a>
+            <td>${{ order_item.item.price }}</td>
+            <td class="text-center">
+              <a
+                href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}"
+                class="btn btn-sm btn-outline-danger"
+              >
+                <i class="fas fa-minus"></i>
+              </a>
+              <span class="mx-2">{{ order_item.quantity }}</span>
+              <a
+                href="{% url 'core:add-to-cart' order_item.item.slug %}"
+                class="btn btn-sm btn-outline-success"
+              >
+                <i class="fas fa-plus"></i>
+              </a>
             </td>
             <td>
-            {% if order_item.item.discount_price %}
-                ${{ order_item.get_total_discount_item_price }}
-                <span class="badge badge-primary">Saving ${{ order_item.get_amount_saved }}</span>
-            {% else %}
-                ${{ order_item.get_total_item_price }}
-            {% endif %}
-            <a style='color: red;' href="{% url 'core:remove-from-cart' order_item.item.slug %}">
-                <i class="fas fa-trash float-right"></i>
-            </a>
+              {% if order_item.item.discount_price %}
+              <span class="text-success font-weight-bold"
+                >${{ order_item.get_total_discount_item_price }}</span
+              >
+              <span class="badge badge-primary"
+                >Saving ${{ order_item.get_amount_saved }}</span
+              >
+              {% else %} ${{ order_item.get_total_item_price }} {% endif %}
+              <a
+                href="{% url 'core:remove-from-cart' order_item.item.slug %}"
+                class="text-danger float-right"
+                data-toggle="tooltip"
+                title="Remove Item"
+              >
+                <i class="fas fa-trash-alt"></i>
+              </a>
             </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan='5'>Your cart is empty</td>
-        </tr>
-        <tr>
-            <td colspan="5">
-            <a class='btn btn-primary float-right' href='/'>Continue shopping</a>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">
+              <p class="my-4">🚀 Your cart is empty! Start shopping now.</p>
             </td>
-        </tr>
-        {% endfor %}
-        {% if object.coupon %}
-        <tr>
-            <td colspan="4"><b>Coupon</b></td>
-            <td><b>-${{ object.coupon.amount }}</b></td>
-        </tr>
-        {% endif %}
-        {% if object.get_total %}
-        <tr>
-            <td colspan="4"><b>Order Total</b></td>
+          </tr>
+          {% endfor %} {% if object.coupon %}
+          <tr>
+            <td colspan="4"><b>🎟 Coupon Applied</b></td>
+            <td class="text-success"><b>-${{ object.coupon.amount }}</b></td>
+          </tr>
+          {% endif %} {% if object.get_total %}
+          <tr class="table-info">
+            <td colspan="4"><b>💰 Order Total</b></td>
             <td><b>${{ object.get_total }}</b></td>
-        </tr>
-        <tr>
-            <td colspan="5">
-            <a class='btn btn-warning float-right ml-2' href='/checkout/'>Proceed to checkout</a>
-            <a class='btn btn-primary float-right' href='/'>Continue shopping</a>
+          </tr>
+          <tr>
+            <td colspan="5" class="text-right">
+              <a href="/" class="btn btn-primary"
+                ><i class="fas fa-shopping-cart"></i> Continue Shopping</a
+              >
+              <a href="/checkout/" class="btn btn-warning ml-2"
+                ><i class="fas fa-credit-card"></i> Proceed to Checkout</a
+              >
             </td>
-        </tr>
-        {% endif %}
+          </tr>
+          {% endif %}
         </tbody>
-    </table>
-
+      </table>
     </div>
+  </div>
+</main>
 
-    </div>
-  </main>
+<!-- تفعيل التلميحات (Tooltip) -->
+<script>
+  $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
 
 {% endblock content %}
-
-
